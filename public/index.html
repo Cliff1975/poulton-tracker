@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Poulton Consultancy – Payment Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'DM Sans',sans-serif;background:#f8f9fa;color:#2d3748;min-height:100vh;-webkit-font-smoothing:antialiased}
+.pf{font-family:'Playfair Display',serif}
+:root{--n9:#1a3a5c;--n7:#2c4f73;--n5:#4a6785;--gold:#c8aa6e;--gl:#d4be7f;--white:#fff;--off:#f8f9fa;--dark:#2d3748}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#f1f1f1}::-webkit-scrollbar-thumb{background:var(--n5);border-radius:4px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.fu{animation:fadeUp .3s ease forwards}
+.spin{animation:spin .8s linear infinite;display:inline-block}
+
+/* HEADER */
+header{background:linear-gradient(135deg,var(--n9),var(--n7));position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.h-inner{max-width:1140px;margin:0 auto;padding:0 16px;height:62px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.logo-box{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--gl));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.logo-name{color:var(--white);font-family:'Playfair Display',serif;font-size:15px;font-weight:700;line-height:1.2}
+.logo-sub{color:var(--gl);font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase}
+.nav-area{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.nav-btn{padding:5px 11px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:600;background:transparent;color:var(--white);transition:all .2s;font-family:'DM Sans',sans-serif}
+.nav-btn.active{background:rgba(200,170,110,.25);color:var(--gl)}
+.role-wrap{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.1);border-radius:8px;padding:4px 8px;margin-left:6px}
+.role-lbl{color:var(--gl);font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+.role-btn{padding:3px 9px;border-radius:6px;border:none;cursor:pointer;font-size:11px;font-weight:700;background:transparent;color:var(--gl);transition:all .15s;font-family:'DM Sans',sans-serif}
+.role-btn.active{background:var(--gold);color:var(--n9)}
+
+/* SAVE INDICATOR */
+#save-msg{color:var(--gl);font-size:11px;font-weight:600;margin-right:4px;opacity:0;transition:opacity .3s}
+#save-msg.show{opacity:1}
+
+/* BANNER */
+#unnamed-banner{background:linear-gradient(90deg,var(--gold),var(--gl));padding:9px 16px;display:none}
+.banner-inner{max-width:1140px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.banner-text{font-weight:700;color:var(--n9);font-size:13px}
+.banner-btn{padding:5px 14px;border-radius:7px;border:none;cursor:pointer;background:var(--n9);color:var(--white);font-size:12px;font-weight:700;font-family:'DM Sans',sans-serif}
+
+/* MAIN */
+#main-content{max-width:1140px;margin:0 auto;padding:24px 16px}
+
+/* STATS */
+.stats-row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:24px}
+.stat{background:var(--white);border-radius:12px;padding:18px 20px;box-shadow:0 4px 15px rgba(0,0,0,.07);flex:1 1 150px;min-width:140px}
+.stat-icon{font-size:20px;margin-bottom:6px}
+.stat-val{font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--n9);line-height:1}
+.stat-lbl{font-size:11px;color:var(--n5);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+.stat-sub{font-size:11px;color:#6b7280;margin-top:2px}
+.bar-track{margin-top:8px;background:#e5e7eb;border-radius:99px;height:4px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--n7),var(--gold));border-radius:99px;transition:width .5s}
+
+/* CARD */
+.card{background:var(--white);border-radius:12px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.07);margin-bottom:16px}
+.ch{padding:14px 20px;background:linear-gradient(135deg,var(--n9),var(--n7))}
+.ch.light{background:linear-gradient(135deg,var(--n7),var(--n5))}
+.ch h3{font-family:'Playfair Display',serif;color:var(--white);font-size:15px}
+.ch p{color:var(--gl);font-size:12px;margin-top:2px}
+.cb{padding:20px}
+
+/* OVERVIEW BARS */
+.prog{margin-bottom:14px}
+.prog-top{display:flex;justify-content:space-between;margin-bottom:5px}
+.prog-name{font-size:13px;font-weight:600;color:var(--n7)}
+.prog-num{font-size:13px;font-weight:700;color:var(--gold)}
+.prog-track{background:#e5e7eb;border-radius:99px;height:8px;overflow:hidden}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--n7),var(--gold));border-radius:99px;transition:width .6s}
+
+/* STATUS TILES */
+.tile-row{display:flex;flex-wrap:wrap;gap:10px}
+.tile{border-radius:10px;padding:12px 20px;cursor:pointer;flex:1 1 100px;text-align:center;transition:transform .15s;min-width:100px}
+.tile:hover{transform:translateY(-2px)}
+.tile-val{font-size:22px;font-weight:700}
+.tile-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+
+/* TABLE */
+.tbl-wrap{background:var(--white);border-radius:12px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.07)}
+.tbl-head{padding:11px 16px;background:linear-gradient(135deg,var(--n9),var(--n7));display:grid;gap:0}
+.th{font-size:10px;font-weight:700;color:var(--gl);text-transform:uppercase;letter-spacing:.6px}
+.tbl-row{display:grid;gap:0;padding:11px 16px;border-bottom:1px solid #f3f4f6;align-items:center;transition:background .15s;border-left:3px solid transparent}
+.tbl-row:hover{background:#f0f4f8}
+.tbl-row:last-child{border-bottom:none}
+.tbl-row.unnamed{border-left-color:var(--gold);background:rgba(200,170,110,.04)}
+.tbl-row.named{border-left-color:#10b981}
+.cell-main{font-weight:600;font-size:13px;color:var(--n9)}
+.cell-sub{font-size:10px;color:#9ca3af;margin-top:1px}
+.cell-email{font-size:12px;color:#4b5563;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:6px}
+.cell-amt{font-size:13px;font-weight:700;color:var(--n9)}
+.cell-amt-sub{font-size:10px;color:#6b7280}
+
+/* BADGE */
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;display:inline-block;cursor:pointer}
+.b-Paid{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0}
+.b-Partial{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+.b-Pending{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.b-Unpaid{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+
+/* INLINE EDIT */
+.ie{cursor:pointer;display:block;padding:5px 9px;border-radius:6px;font-size:13px;transition:all .15s;min-width:100px;border:1.5px dashed transparent;font-family:'DM Sans',sans-serif}
+.ie.empty{color:#9ca3af;font-style:italic;background:rgba(200,170,110,.08);border-color:var(--gold)}
+.ie.filled{color:var(--dark);border-color:transparent}
+.ie-input{padding:5px 9px;border:2px solid var(--gold)!important;border-radius:6px;font-size:13px;width:100%;font-family:'DM Sans',sans-serif;color:var(--dark);outline:none}
+
+/* BUTTONS */
+.btn{padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:linear-gradient(135deg,var(--n9),var(--n7));color:var(--white);font-family:'DM Sans',sans-serif;transition:opacity .2s}
+.btn:hover{opacity:.9}
+.btn-sec{background:var(--white);color:var(--n7);border:1.5px solid #e2e8f0;padding:9px 18px}
+.btn-sm{padding:7px 14px;font-size:12px}
+.btn-danger{background:#fee2e2;color:#991b1b;border:none;padding:7px 12px}
+.icon-btn{width:28px;height:28px;border-radius:6px;border:none;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;transition:opacity .15s}
+.icon-btn:hover{opacity:.7}
+.icon-btn.edit{background:#f0f4f8}
+.icon-btn.del{background:#fee2e2}
+
+/* TOOLBAR */
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+.filter-count{font-size:12px;color:#6b7280;margin-bottom:10px}
+
+/* FORM INPUTS */
+input[type=text],input[type=email],input[type=number],input[type=date],select,textarea{
+  width:100%;padding:9px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;color:var(--dark);
+  outline:none;background:var(--white);font-family:'DM Sans',sans-serif;transition:border .2s}
+input:focus,select:focus,textarea:focus{border-color:var(--gold)}
+select{width:auto;flex:none;cursor:pointer}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--n7);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.field label span.req{color:#ef4444;margin-left:2px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.span2{grid-column:1/-1}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(26,58,92,.65);backdrop-filter:blur(5px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.overlay.open{display:flex}
+.modal{background:var(--white);border-radius:16px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.22);animation:fadeUp .25s ease}
+.modal.wide{max-width:680px}
+.modal-head{background:linear-gradient(135deg,var(--n9),var(--n7));padding:18px 24px;border-radius:16px 16px 0 0;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.modal-head h3{font-family:'Playfair Display',serif;color:var(--white);font-size:17px}
+.modal-close{background:rgba(255,255,255,.15);border:none;color:var(--white);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;line-height:1;font-family:'DM Sans',sans-serif}
+.modal-body{padding:24px}
+
+/* SECTION DIVIDER IN MODAL */
+.form-section{border-radius:8px;padding:10px 14px;margin-bottom:14px}
+.form-section.payer{background:#f0f4f8}
+.form-section.student{background:rgba(200,170,110,.08);border:1.5px dashed var(--gold)}
+.form-section-title{font-size:11px;font-weight:700;color:var(--n5);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+
+/* PIN SCREEN */
+#pin-screen{position:fixed;inset:0;background:linear-gradient(135deg,var(--n9),var(--n7));z-index:999;display:flex;align-items:center;justify-content:center;padding:20px}
+.pin-card{background:var(--white);border-radius:20px;padding:40px 36px;width:100%;max-width:380px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.3);animation:fadeUp .4s ease}
+.pin-logo{width:60px;height:60px;border-radius:14px;background:linear-gradient(135deg,var(--gold),var(--gl));display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 20px}
+.pin-title{font-family:'Playfair Display',serif;font-size:22px;color:var(--n9);margin-bottom:6px}
+.pin-sub{font-size:13px;color:#6b7280;margin-bottom:24px;line-height:1.5}
+.pin-input{width:100%;text-align:center;font-size:28px;letter-spacing:12px;padding:14px 16px;border:2px solid #e2e8f0;border-radius:10px;outline:none;font-family:'DM Sans',sans-serif;color:var(--n9);transition:border .2s;margin-bottom:14px}
+.pin-input:focus{border-color:var(--gold)}
+.pin-error{color:#ef4444;font-size:13px;margin-top:-8px;margin-bottom:12px;min-height:20px}
+.pin-hint{font-size:11px;color:#9ca3af;margin-top:12px}
+
+/* LOADING */
+#loading-overlay{position:fixed;inset:0;background:rgba(255,255,255,.8);z-index:500;display:none;align-items:center;justify-content:center}
+#loading-overlay.show{display:flex}
+.loader{font-size:13px;color:var(--n7);font-weight:600;display:flex;align-items:center;gap:8px}
+
+/* STEP ITEMS */
+.step-item{display:flex;gap:12px;align-items:flex-start;background:var(--off);padding:12px 14px;border-radius:8px}
+.step-num{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--n9),var(--n7));color:var(--gl);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-title{font-weight:700;font-size:13px;color:var(--n9);margin-bottom:2px}
+.step-desc{font-size:12px;color:#6b7280;line-height:1.6}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;background:var(--white);border-radius:12px;box-shadow:0 4px 15px rgba(0,0,0,.07)}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--n9);margin-bottom:8px}
+.empty-sub{font-size:13px;color:#6b7280;margin-bottom:20px}
+.empty-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* MATCH VIEW FILTERS */
+.filter-pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{padding:6px 12px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:600;background:var(--off);color:var(--n7);transition:all .15s;font-family:'DM Sans',sans-serif}
+.pill.active{background:var(--n9);color:var(--white)}
+
+/* INFO BOX */
+.info-box{border-radius:8px;padding:10px 14px;font-size:12px;display:flex;gap:8px;align-items:flex-start;line-height:1.6;margin-top:12px}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .h-inner{height:auto;padding:10px 12px}
+  .nav-area{gap:2px}
+  .nav-btn{font-size:11px;padding:4px 8px}
+  .role-wrap{display:none}
+  .grid2{grid-template-columns:1fr}
+  .span2{grid-column:1}
+  .stat{flex:1 1 120px;min-width:120px;padding:14px 14px}
+  .stat-val{font-size:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- PIN SCREEN -->
+<div id="pin-screen">
+  <div class="pin-card">
+    <div class="pin-logo">🎓</div>
+    <h1 class="pf pin-title">Payment Tracker</h1>
+    <p class="pin-sub">Poulton Consultancy<br/>Enter your PIN to continue</p>
+    <input type="password" id="pin-input" class="pin-input" placeholder="••••" maxlength="8" inputmode="numeric"/>
+    <div id="pin-error" class="pin-error"></div>
+    <button class="btn" onclick="submitPin()" style="width:100%">Continue →</button>
+    <p class="pin-hint">Contact Poulton Consultancy for access</p>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="loading-overlay">
+  <div class="loader"><span class="spin">⏳</span> Saving…</div>
+</div>
+
+<!-- APP (hidden until PIN) -->
+<div id="app" style="display:none">
+
+  <header>
+    <div class="h-inner">
+      <div class="logo-box">
+        <div class="logo-icon">🎓</div>
+        <div>
+          <div class="logo-name" id="hdr-trip-name">School Trip</div>
+          <div class="logo-sub" id="hdr-organiser">Poulton Consultancy · Tracker</div>
+        </div>
+      </div>
+      <div class="nav-area">
+        <span id="save-msg">Saved ✓</span>
+        <button class="nav-btn active" onclick="showView('dashboard')">Dashboard</button>
+        <button class="nav-btn" onclick="showView('payments')">Payments</button>
+        <button class="nav-btn" onclick="showView('match')">Match Students</button>
+        <button class="nav-btn" id="settings-nav-btn" onclick="showView('settings')">Settings</button>
+        <div class="role-wrap" id="role-wrap">
+          <span class="role-lbl">View:</span>
+          <button class="role-btn active" onclick="setRole('admin')">Admin</button>
+          <button class="role-btn" onclick="setRole('teacher')">Teacher</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div id="unnamed-banner">
+    <div class="banner-inner">
+      <span class="banner-text" id="banner-text">⚠️ payments need student names</span>
+      <button class="banner-btn" onclick="showView('match');setFilter('filterNamed','Unnamed')">Match Now →</button>
+    </div>
+  </div>
+
+  <div id="main-content">
+
+    <!-- DASHBOARD -->
+    <div id="view-dashboard" class="fu">
+      <div class="stats-row" id="stats-row"></div>
+      <div class="card">
+        <div class="ch"><h3>Collection Overview</h3></div>
+        <div class="cb" id="overview-bars"></div>
+      </div>
+      <div class="tile-row" id="status-tiles"></div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div id="view-payments" style="display:none" class="fu">
+      <div class="toolbar">
+        <input type="text" id="search-input" placeholder="🔍  Search payer, email, student…" class="search-input" oninput="renderPayments()"/>
+        <select onchange="state.filterStatus=this.value;renderPayments()">
+          <option value="All">All Statuses</option>
+          <option>Paid</option><option>Partial</option><option>Pending</option><option>Unpaid</option>
+        </select>
+        <select id="named-filter" onchange="state.filterNamed=this.value;renderPayments()">
+          <option value="All">All Records</option>
+          <option value="Named">Named ✓</option>
+          <option value="Unnamed">Unnamed ⚠</option>
+        </select>
+        <div id="admin-toolbar-btns" style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sec btn-sm" onclick="openCSVModal()">⬆ Import CSV</button>
+          <button class="btn btn-sec btn-sm" onclick="exportCSV()">⬇ Export</button>
+          <button class="btn btn-sm" onclick="openAddModal()">+ Add Payment</button>
+        </div>
+      </div>
+      <div class="filter-count" id="filter-count"></div>
+      <div id="payments-table"></div>
+    </div>
+
+    <!-- MATCH STUDENTS -->
+    <div id="view-match" style="display:none" class="fu">
+      <div class="card">
+        <div class="ch" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div>
+            <h3>Match Students to Payments</h3>
+            <p>Click any student name cell and type the name. Saves instantly.</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <div style="background:rgba(255,255,255,.1);border-radius:8px;padding:6px 16px;text-align:center">
+              <div style="font-size:20px;font-weight:700;color:var(--gl)" id="match-named-count">0</div>
+              <div style="font-size:10px;color:#93c5fd;text-transform:uppercase;letter-spacing:.4px">Named</div>
+            </div>
+            <div style="background:rgba(200,170,110,.2);border-radius:8px;padding:6px 16px;text-align:center">
+              <div style="font-size:20px;font-weight:700;color:var(--gold)" id="match-unnamed-count">0</div>
+              <div style="font-size:10px;color:var(--gl);text-transform:uppercase;letter-spacing:.4px">Remaining</div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:12px 20px;border-bottom:1px solid #f3f4f6;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <input type="text" id="match-search" placeholder="🔍  Filter by payer name or email…" style="flex:1 1 200px;max-width:300px" oninput="renderMatch()"/>
+          <div class="filter-pills">
+            <button class="pill active" onclick="setMatchFilter('All')" id="pill-All">All</button>
+            <button class="pill" onclick="setMatchFilter('Unnamed')" id="pill-Unnamed">⚠ Unnamed</button>
+            <button class="pill" onclick="setMatchFilter('Named')" id="pill-Named">✓ Named</button>
+          </div>
+        </div>
+        <!-- match table header -->
+        <div id="match-tbl-head" style="display:grid;grid-template-columns:1.2fr 1.4fr 1.2fr 1fr 90px;padding:10px 20px;background:var(--off);border-bottom:1px solid #e5e7eb">
+          <span class="th" style="color:var(--n5)">Payer Name</span>
+          <span class="th" style="color:var(--n5)">Payer Email</span>
+          <span class="th" style="color:var(--n5)">Student Name</span>
+          <span class="th" style="color:var(--n5)">Grade / Class</span>
+          <span class="th" style="color:var(--n5);text-align:right">Status</span>
+        </div>
+        <div id="match-rows"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="view-settings" style="display:none" class="fu">
+      <!-- Admin settings -->
+      <div id="settings-admin">
+        <div class="card">
+          <div class="ch light"><h3>Trip Configuration</h3></div>
+          <div class="cb" id="config-display"></div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>How This Tracker Works</h3></div>
+          <div class="cb" style="display:flex;flex-direction:column;gap:10px">
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <div><div class="step-title">Stripe captures payer details</div><div class="step-desc">Parent pays via Stripe. Stripe records name, email, amount and date — but NOT the student name.</div></div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div><div class="step-title">Import the Stripe CSV</div><div class="step-desc">Export from Stripe Dashboard → Payments → Export CSV. Import here via the Payments tab. All payer data populates automatically.</div></div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">3</div>
+              <div><div class="step-title">Teacher assigns student names</div><div class="step-desc">Share this URL with your school contact (Teacher PIN). They use the Match Students tab to click each row and type the student name. Saves instantly to the server.</div></div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">4</div>
+              <div><div class="step-title">Export the complete record</div><div class="step-desc">Once all students are matched, export the full CSV from the Payments tab for your school records.</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ch"><h3>Render Environment Variables</h3></div>
+          <div class="cb">
+            <p style="font-size:13px;color:#6b7280;line-height:1.7;margin-bottom:14px">
+              Set these in your Render Dashboard → Service → Environment to customise PINs and data location:
+            </p>
+            <div style="background:#1e293b;border-radius:8px;padding:16px;font-family:monospace;font-size:12px;color:#e2e8f0;line-height:2">
+              ADMIN_PIN=<span style="color:var(--gold)">your-admin-pin</span><br/>
+              TEACHER_PIN=<span style="color:var(--gold)">your-teacher-pin</span><br/>
+              DATA_DIR=<span style="color:var(--gold)">/var/data</span> <span style="color:#64748b"># set to your persistent disk mount path</span>
+            </div>
+            <div class="info-box" style="background:#fffbeb;border:1px solid #fcd34d;color:#92400e;margin-top:12px">
+              <span>⚡</span>
+              <span><strong>Persistent Disk:</strong> Add a Render Disk mounted at <code>/var/data</code> and set <code>DATA_DIR=/var/data</code>. Without a disk, data resets on each deploy — the disk costs ~$0.25/GB/month on paid plans.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Teacher locked settings -->
+      <div id="settings-teacher" style="display:none;text-align:center;padding:60px">
+        <div style="font-size:48px;margin-bottom:12px">🔒</div>
+        <div class="pf" style="font-size:20px;color:var(--n9);margin-bottom:8px">Admin Only</div>
+        <p style="font-size:13px;color:#6b7280">Settings are restricted to admin users.</p>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /app -->
+
+<!-- EDIT/ADD MODAL -->
+<div id="edit-modal" class="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3 id="edit-modal-title">Add Payment Record</h3>
+      <button class="modal-close" onclick="closeModal('edit-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="edit-id"/>
+      <div class="form-section payer">
+        <div class="form-section-title">💳 Payer Details (from Stripe)</div>
+        <div class="grid2">
+          <div class="field">
+            <label>Payer Full Name <span class="req">*</span></label>
+            <input type="text" id="f-payerName" placeholder="Parent / guardian name"/>
+          </div>
+          <div class="field">
+            <label>Payer Email <span class="req">*</span></label>
+            <input type="email" id="f-payerEmail" placeholder="parent@email.com"/>
+          </div>
+          <div class="field">
+            <label>Stripe Payment ID</label>
+            <input type="text" id="f-stripeId" placeholder="pi_…"/>
+          </div>
+          <div class="field">
+            <label>Payment Date</label>
+            <input type="date" id="f-date"/>
+          </div>
+          <div class="field">
+            <label>Amount Due (AED)</label>
+            <input type="number" id="f-amountDue" placeholder="350"/>
+          </div>
+          <div class="field">
+            <label>Amount Paid (AED)</label>
+            <input type="number" id="f-amount" placeholder="0.00"/>
+          </div>
+          <div class="field span2">
+            <label>Payment Status</label>
+            <select id="f-status">
+              <option>Paid</option><option>Partial</option>
+              <option selected>Pending</option><option>Unpaid</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-section student">
+        <div class="form-section-title">🎓 Student Details (teacher completes)</div>
+        <div class="grid2">
+          <div class="field">
+            <label>Student Full Name</label>
+            <input type="text" id="f-studentName" placeholder="Teacher to complete…"/>
+          </div>
+          <div class="field">
+            <label>Grade / Class</label>
+            <input type="text" id="f-grade" placeholder="e.g. Grade 7B"/>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Notes</label>
+        <textarea id="f-notes" style="min-height:56px;resize:vertical;width:100%" placeholder="Any additional notes…"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="submitEdit()">Save Record</button>
+        <button class="btn btn-sec" onclick="closeModal('edit-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CSV IMPORT MODAL -->
+<div id="csv-modal" class="overlay">
+  <div class="modal wide">
+    <div class="modal-head">
+      <h3>Import Stripe CSV Export</h3>
+      <button class="modal-close" onclick="closeModal('csv-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:#6b7280;line-height:1.7;margin-bottom:14px">
+        <strong>Stripe Dashboard → Payments → Export → CSV.</strong> Paste the full content below.
+        Student names will be blank — the teacher fills those in via Match Students.
+      </p>
+      <div class="field">
+        <label>Paste CSV Content</label>
+        <textarea id="csv-raw" style="min-height:130px;resize:vertical;font-family:monospace;font-size:11px;width:100%"
+          placeholder="id,amount,status,customer name,customer email,created (UTC)&#10;pi_xxx,35000,succeeded,Sara Ahmed,sara@email.com,2025-03-01"
+          oninput="document.getElementById('csv-preview-area').innerHTML='';document.getElementById('csv-import-btn').style.display='none';document.getElementById('csv-preview-btn').style.display='inline-block'">
+        </textarea>
+      </div>
+      <div id="csv-preview-area"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" id="csv-preview-btn" onclick="previewCSV()">Preview Records</button>
+        <button class="btn" id="csv-import-btn" style="display:none" onclick="importCSV()">Import Records</button>
+        <button class="btn btn-sec" onclick="closeModal('csv-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIG MODAL -->
+<div id="config-modal" class="overlay">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Edit Trip Configuration</h3>
+      <button class="modal-close" onclick="closeModal('config-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid2">
+        <div class="field"><label>Trip Name</label><input type="text" id="cfg-name"/></div>
+        <div class="field"><label>School Name</label><input type="text" id="cfg-school"/></div>
+        <div class="field"><label>Default Amount Due (AED)</label><input type="number" id="cfg-amountDue"/></div>
+        <div class="field"><label>Organiser</label><input type="text" id="cfg-organiser"/></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="saveConfig()">Save Config</button>
+        <button class="btn btn-sec" onclick="closeModal('config-modal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════════════ */
+const API = '';  // same origin
+let state = {
+  pin:          '',
+  role:         'admin',
+  currentView:  'dashboard',
+  data:         { tripConfig: {}, records: [] },
+  filterStatus: 'All',
+  filterNamed:  'All',
+  matchFilter:  'All',
+};
+
+const STATUS_CYCLE = { Unpaid:'Pending', Pending:'Partial', Partial:'Paid', Paid:'Unpaid' };
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PIN AUTH
+═══════════════════════════════════════════════════════════════════════ */
+document.getElementById('pin-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitPin(); });
+
+async function submitPin() {
+  const pin = document.getElementById('pin-input').value.trim();
+  if (!pin) return;
+  try {
+    const res  = await fetch('/api/auth', {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ pin })
+    });
+    const data = await res.json();
+    if (!res.ok) { document.getElementById('pin-error').textContent = 'Incorrect PIN. Please try again.'; return; }
+    state.pin  = pin;
+    state.role = data.role;
+    document.getElementById('pin-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    await loadData();
+    applyRole();
+  } catch(e) {
+    document.getElementById('pin-error').textContent = 'Connection error. Is the server running?';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   API HELPERS
+═══════════════════════════════════════════════════════════════════════ */
+async function api(method, path, body) {
+  const opts = {
+    method,
+    headers: { 'Content-Type':'application/json', 'x-pin': state.pin }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res  = await fetch(API + path, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'API error');
+  return data;
+}
+
+async function loadData() {
+  const d = await api('GET', '/api/data');
+  state.data = d;
+  renderAll();
+}
+
+function showLoader() { document.getElementById('loading-overlay').classList.add('show'); }
+function hideLoader() { document.getElementById('loading-overlay').classList.remove('show'); }
+function flashSaved() {
+  const el = document.getElementById('save-msg');
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ROLE
+═══════════════════════════════════════════════════════════════════════ */
+function setRole(role) {
+  state.role = role;
+  document.querySelectorAll('.role-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase() === role));
+  applyRole();
+  renderAll();
+}
+
+function applyRole() {
+  const isAdmin = state.role === 'admin';
+  // Hide admin-only nav if teacher
+  document.getElementById('settings-nav-btn').style.display = isAdmin ? '' : '';
+  document.getElementById('admin-toolbar-btns').style.display = isAdmin ? 'flex' : 'none';
+  document.getElementById('settings-admin').style.display  = isAdmin ? '' : 'none';
+  document.getElementById('settings-teacher').style.display = isAdmin ? 'none' : '';
+  // If teacher and on payments/settings, redirect to match
+  if (!isAdmin && (state.currentView === 'settings')) showView('match');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   VIEWS
+═══════════════════════════════════════════════════════════════════════ */
+function showView(v) {
+  state.currentView = v;
+  ['dashboard','payments','match','settings'].forEach(id => {
+    document.getElementById('view-' + id).style.display = id === v ? '' : 'none';
+  });
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim().toLowerCase().startsWith(v === 'match' ? 'match' : v));
+  });
+  if (v === 'dashboard') renderDashboard();
+  if (v === 'payments')  renderPayments();
+  if (v === 'match')     renderMatch();
+  if (v === 'settings')  renderSettings();
+}
+
+function setFilter(key, val) {
+  state[key] = val;
+  if (key === 'filterNamed') {
+    document.getElementById('named-filter').value = val;
+    renderPayments();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   RENDER ALL
+═══════════════════════════════════════════════════════════════════════ */
+function renderAll() {
+  const { tripConfig } = state.data;
+  document.getElementById('hdr-trip-name').textContent = tripConfig.name || 'School Trip';
+  document.getElementById('hdr-organiser').textContent = (tripConfig.organiser || 'Poulton Consultancy') + ' · Tracker';
+  updateBanner();
+  if (state.currentView === 'dashboard') renderDashboard();
+  if (state.currentView === 'payments')  renderPayments();
+  if (state.currentView === 'match')     renderMatch();
+  if (state.currentView === 'settings')  renderSettings();
+}
+
+function updateBanner() {
+  const unnamed = state.data.records.filter(r => !r.studentName.trim()).length;
+  const banner  = document.getElementById('unnamed-banner');
+  if (unnamed > 0) {
+    banner.style.display = '';
+    document.getElementById('banner-text').textContent =
+      `⚠️  ${unnamed} payment${unnamed !== 1 ? 's' : ''} still need${unnamed === 1 ? 's' : ''} a student name assigned`;
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════════════════════════════ */
+function renderDashboard() {
+  const recs  = state.data.records;
+  const cfg   = state.data.tripConfig;
+  const total = recs.length;
+  const named     = recs.filter(r => r.studentName && r.studentName.trim()).length;
+  const unnamed   = total - named;
+  const paidCount = recs.filter(r => r.status === 'Paid').length;
+  const collected = recs.reduce((s,r) => s + (['Paid','Partial'].includes(r.status) ? parseFloat(r.amount||0) : 0), 0);
+  const totalDue  = recs.reduce((s,r) => s + parseFloat(r.amountDue || cfg.amountDue || 0), 0);
+  const paidPct   = total ? Math.round((paidCount/total)*100) : 0;
+  const namedPct  = total ? Math.round((named/total)*100) : 0;
+
+  document.getElementById('stats-row').innerHTML = `
+    ${statCard('💳','Total Payments',total,`${paidCount} fully paid`,'var(--n7)',null)}
+    ${statCard('💰','Collected',fmtAED(collected),`of ${fmtAED(totalDue)} due`,'var(--gold)',null)}
+    ${statCard('✅','Payment Progress',paidPct+'%',`${paidCount} of ${total} paid`,'#10b981',paidPct)}
+    ${statCard('🔤','Students Named',namedPct+'%',unnamed?`${unnamed} still need a name`:`All ${named} matched`,unnamed?'var(--gold)':'#10b981',namedPct)}
+  `;
+
+  document.getElementById('overview-bars').innerHTML = [
+    {label:'Payments Received',pct:paidPct,val:`${paidCount} / ${total}`},
+    {label:'Students Named',pct:namedPct,val:`${named} / ${total}`},
+    {label:'Amount Collected',pct:totalDue?Math.round((collected/totalDue)*100):0,val:`${fmtAED(collected)} / ${fmtAED(totalDue)}`},
+  ].map(({label,pct,val}) => `
+    <div class="prog">
+      <div class="prog-top"><span class="prog-name">${label}</span><span class="prog-num">${val}</span></div>
+      <div class="prog-track"><div class="prog-bar" style="width:${pct}%"></div></div>
+    </div>
+  `).join('');
+
+  const statusMeta = {
+    Paid:   {bg:'#d1fae5',color:'#065f46',border:'#a7f3d0'},
+    Partial:{bg:'#dbeafe',color:'#1e40af',border:'#93c5fd'},
+    Pending:{bg:'#fef3c7',color:'#92400e',border:'#fcd34d'},
+    Unpaid: {bg:'#fee2e2',color:'#991b1b',border:'#fca5a5'},
+  };
+  document.getElementById('status-tiles').innerHTML =
+    ['Paid','Partial','Pending','Unpaid'].map(s => {
+      const cnt = recs.filter(r => r.status === s).length;
+      const m   = statusMeta[s];
+      return `<div class="tile" onclick="setFilter('filterStatus','${s}');showView('payments')"
+        style="background:${m.bg};border:1.5px solid ${m.border}">
+        <div class="tile-val" style="color:${m.color}">${cnt}</div>
+        <div class="tile-lbl" style="color:${m.color}">${s}</div>
+      </div>`;
+    }).join('');
+}
+
+function statCard(icon, label, value, sub, color, bar) {
+  return `<div class="stat" style="border-left:4px solid ${color}">
+    <div class="stat-icon">${icon}</div>
+    <div class="stat-val">${value}</div>
+    <div class="stat-lbl">${label}</div>
+    <div class="stat-sub">${sub}</div>
+    ${bar != null ? `<div class="bar-track"><div class="bar-fill" style="width:${bar}%"></div></div>` : ''}
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PAYMENTS TABLE
+═══════════════════════════════════════════════════════════════════════ */
+function getFiltered() {
+  const q = (document.getElementById('search-input').value || '').toLowerCase();
+  return state.data.records.filter(r => {
+    const mQ = !q || r.payerName.toLowerCase().includes(q) || r.payerEmail.toLowerCase().includes(q)
+               || r.studentName.toLowerCase().includes(q) || r.grade.toLowerCase().includes(q);
+    const mS = state.filterStatus === 'All' || r.status === state.filterStatus;
+    const mN = state.filterNamed  === 'All'
+      || (state.filterNamed === 'Named'   ?  !!(r.studentName && r.studentName.trim())
+      :                                      !(r.studentName && r.studentName.trim()));
+    return mQ && mS && mN;
+  });
+}
+
+function renderPayments() {
+  const filtered = getFiltered();
+  const recs     = state.data.records;
+  const cfg      = state.data.tripConfig;
+  const isAdmin  = state.role === 'admin';
+
+  document.getElementById('filter-count').textContent =
+    `${filtered.length} of ${recs.length} record${recs.length !== 1 ? 's' : ''}`;
+
+  const cols = isAdmin
+    ? '1.3fr 1.5fr 1.2fr 95px 110px 75px'
+    : '1.3fr 1.5fr 1.2fr 95px 110px';
+
+  if (recs.length === 0) {
+    document.getElementById('payments-table').innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">💳</div>
+        <div class="empty-title">No Records Yet</div>
+        <div class="empty-sub">Import a Stripe CSV or add records manually.</div>
+        ${isAdmin ? `<div class="empty-btns">
+          <button class="btn" onclick="openAddModal()">+ Add Payment</button>
+          <button class="btn btn-sec" onclick="openCSVModal()">⬆ Import CSV</button>
+        </div>` : ''}
+      </div>`;
+    return;
+  }
+
+  const headTitles = ['Payer Name','Payer Email','Student Name','Amt Due','Status', ...(isAdmin?['Actions']:[])];
+  let html = `<div class="tbl-wrap">
+    <div class="tbl-head" style="grid-template-columns:${cols}">
+      ${headTitles.map(h => `<span class="th">${h}</span>`).join('')}
+    </div>`;
+
+  filtered.forEach((r, i) => {
+    const named   = r.studentName && r.studentName.trim();
+    const amtDue  = fmtAED(r.amountDue || cfg.amountDue);
+    html += `<div class="tbl-row ${named?'named':'unnamed'}" style="grid-template-columns:${cols};background:${i%2===0?'var(--white)':'#fafbfc'}">
+      <div>
+        <div class="cell-main">${esc(r.payerName) || '<em style="color:#9ca3af;font-size:12px;font-style:italic">No name</em>'}</div>
+        ${r.date ? `<div class="cell-sub">${esc(r.date)}</div>` : ''}
+      </div>
+      <div class="cell-email">${esc(r.payerEmail) || '—'}</div>
+      <div style="padding-right:6px">
+        <span class="ie ${named?'filled':'empty'}" onclick="startInlineEdit(this,'${r.id}','studentName')">${named ? esc(r.studentName) : 'Click to assign…'}</span>
+        ${r.grade ? `<div class="cell-sub" style="padding-left:9px">${esc(r.grade)}</div>` : ''}
+      </div>
+      <div>
+        <div class="cell-amt">${amtDue}</div>
+        ${r.amount && parseFloat(r.amount)>0 ? `<div class="cell-amt-sub">Paid: ${fmtAED(r.amount)}</div>` : ''}
+      </div>
+      <div>
+        <span class="badge b-${r.status}" ${isAdmin?`onclick="cycleStatus('${r.id}')" title="Click to cycle"`:''} style="${isAdmin?'cursor:pointer':''}">${r.status}</span>
+      </div>
+      ${isAdmin ? `<div style="display:flex;gap:4px">
+        <button class="icon-btn edit" onclick="openEditModal('${r.id}')" title="Edit">✏️</button>
+        <button class="icon-btn del" onclick="deleteRecord('${r.id}')" title="Delete">🗑</button>
+      </div>` : ''}
+    </div>`;
+  });
+
+  if (filtered.length === 0 && recs.length > 0) {
+    html += `<div style="padding:32px;text-align:center;color:#6b7280;font-size:13px">No records match your filters.</div>`;
+  }
+
+  html += '</div>';
+  document.getElementById('payments-table').innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MATCH VIEW
+═══════════════════════════════════════════════════════════════════════ */
+function setMatchFilter(f) {
+  state.matchFilter = f;
+  document.querySelectorAll('.pill').forEach(p => p.classList.toggle('active', p.id === 'pill-' + f));
+  renderMatch();
+}
+
+function renderMatch() {
+  const recs   = state.data.records;
+  const named  = recs.filter(r => r.studentName && r.studentName.trim()).length;
+  const unnamed = recs.length - named;
+  document.getElementById('match-named-count').textContent   = named;
+  document.getElementById('match-unnamed-count').textContent = unnamed;
+
+  // Update pill labels
+  document.getElementById('pill-All').textContent     = `All (${recs.length})`;
+  document.getElementById('pill-Unnamed').textContent = `⚠ Unnamed (${unnamed})`;
+  document.getElementById('pill-Named').textContent   = `✓ Named (${named})`;
+
+  const q = (document.getElementById('match-search').value || '').toLowerCase();
+  const filtered = recs.filter(r => {
+    const mQ = !q || r.payerName.toLowerCase().includes(q) || r.payerEmail.toLowerCase().includes(q) || r.studentName.toLowerCase().includes(q);
+    const mN = state.matchFilter === 'All'
+      || (state.matchFilter === 'Named'   ?  !!(r.studentName && r.studentName.trim())
+      :                                      !(r.studentName && r.studentName.trim()));
+    return mQ && mN;
+  });
+
+  if (filtered.length === 0 && named === recs.length && recs.length > 0) {
+    document.getElementById('match-rows').innerHTML = `<div style="padding:48px;text-align:center">
+      <div style="font-size:48px;margin-bottom:12px">🎉</div>
+      <div class="pf" style="font-size:20px;color:var(--n9);margin-bottom:6px">All Students Named!</div>
+      <div style="font-size:13px;color:#6b7280">Every payment has been matched to a student.</div>
+    </div>`;
+    return;
+  }
+
+  const cfg = state.data.tripConfig;
+  let html = '';
+  filtered.forEach((r, i) => {
+    const named = r.studentName && r.studentName.trim();
+    html += `<div class="tbl-row" style="display:grid;grid-template-columns:1.2fr 1.4fr 1.2fr 1fr 90px;padding:12px 20px;
+      border-bottom:1px solid #f3f4f6;
+      background:${!named?'rgba(200,170,110,.05)':i%2===0?'var(--white)':'#fafbfc'};
+      border-left:3px solid ${!named?'var(--gold)':'#10b981'};
+      align-items:center;gap:0">
+      <div>
+        <div class="cell-main" style="font-size:14px">${esc(r.payerName)||'—'}</div>
+        <div class="cell-sub">${esc(r.date)||''}</div>
+      </div>
+      <div class="cell-email" style="font-size:12px">${esc(r.payerEmail)||'—'}</div>
+      <div>
+        <span class="ie ${named?'filled':'empty'}" onclick="startInlineEdit(this,'${r.id}','studentName')">${named?esc(r.studentName):'Click to type student name…'}</span>
+      </div>
+      <div>
+        <span class="ie ${r.grade?'filled':'empty'}" style="border-color:transparent;background:${r.grade?'transparent':'rgba(100,116,139,.06)'}"
+          onclick="startInlineEdit(this,'${r.id}','grade')">${r.grade?esc(r.grade):'Click to add grade…'}</span>
+      </div>
+      <div style="text-align:right">
+        <span class="badge b-${r.status}">${r.status}</span>
+        <div style="font-size:10px;color:#6b7280;margin-top:3px">${fmtAED(r.amountDue||cfg.amountDue)}</div>
+      </div>
+    </div>`;
+  });
+
+  if (filtered.length === 0) html = `<div style="padding:32px;text-align:center;color:#6b7280;font-size:13px">No records match the current filter.</div>`;
+
+  document.getElementById('match-rows').innerHTML = html;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INLINE EDIT
+═══════════════════════════════════════════════════════════════════════ */
+function startInlineEdit(span, id, field) {
+  const current = state.data.records.find(r => r.id === id);
+  const val     = current ? (current[field] || '') : '';
+  const input   = document.createElement('input');
+  input.type    = 'text';
+  input.value   = val;
+  input.className = 'ie-input';
+  input.placeholder = field === 'studentName' ? 'Student full name…' : 'Grade / class…';
+  span.replaceWith(input);
+  input.focus();
+  const commit = async () => {
+    const newVal = input.value.trim();
+    if (newVal !== val) {
+      try {
+        const update = {}; update[field] = newVal;
+        const resp = await api('PUT', `/api/records/${id}`, update);
+        // Update local state
+        const idx = state.data.records.findIndex(r => r.id === id);
+        if (idx !== -1) state.data.records[idx][field] = newVal;
+        flashSaved();
+        updateBanner();
+      } catch(e) { alert('Save failed: ' + e.message); }
+    }
+    // Re-render current view
+    if (state.currentView === 'payments') renderPayments();
+    else renderMatch();
+  };
+  input.addEventListener('blur', commit);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); input.blur(); } if (e.key === 'Escape') { input.value = val; input.blur(); } });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   STATUS CYCLE
+═══════════════════════════════════════════════════════════════════════ */
+async function cycleStatus(id) {
+  const rec  = state.data.records.find(r => r.id === id);
+  if (!rec) return;
+  const next = STATUS_CYCLE[rec.status];
+  try {
+    await api('PUT', `/api/records/${id}`, { status: next });
+    rec.status = next;
+    flashSaved();
+    renderPayments();
+    renderDashboard();
+    updateBanner();
+  } catch(e) { alert('Failed: ' + e.message); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ADD / EDIT MODAL
+═══════════════════════════════════════════════════════════════════════ */
+function openAddModal() {
+  const cfg = state.data.tripConfig;
+  document.getElementById('edit-id').value       = '';
+  document.getElementById('edit-modal-title').textContent = 'Add Payment Record';
+  document.getElementById('f-payerName').value   = '';
+  document.getElementById('f-payerEmail').value  = '';
+  document.getElementById('f-stripeId').value    = '';
+  document.getElementById('f-amountDue').value   = cfg.amountDue || '350';
+  document.getElementById('f-amount').value      = '';
+  document.getElementById('f-status').value      = 'Pending';
+  document.getElementById('f-date').value        = todayStr();
+  document.getElementById('f-studentName').value = '';
+  document.getElementById('f-grade').value       = '';
+  document.getElementById('f-notes').value       = '';
+  openModal('edit-modal');
+}
+
+function openEditModal(id) {
+  const r = state.data.records.find(x => x.id === id);
+  if (!r) return;
+  document.getElementById('edit-id').value       = r.id;
+  document.getElementById('edit-modal-title').textContent = 'Edit Payment Record';
+  document.getElementById('f-payerName').value   = r.payerName;
+  document.getElementById('f-payerEmail').value  = r.payerEmail;
+  document.getElementById('f-stripeId').value    = r.stripeId;
+  document.getElementById('f-amountDue').value   = r.amountDue;
+  document.getElementById('f-amount').value      = r.amount;
+  document.getElementById('f-status').value      = r.status;
+  document.getElementById('f-date').value        = r.date;
+  document.getElementById('f-studentName').value = r.studentName;
+  document.getElementById('f-grade').value       = r.grade;
+  document.getElementById('f-notes').value       = r.notes;
+  openModal('edit-modal');
+}
+
+async function submitEdit() {
+  const pName  = document.getElementById('f-payerName').value.trim();
+  const pEmail = document.getElementById('f-payerEmail').value.trim();
+  if (!pName && !pEmail) { alert('Payer name or email is required.'); return; }
+  const id = document.getElementById('edit-id').value;
+  const payload = {
+    payerName:   pName,
+    payerEmail:  pEmail,
+    stripeId:    document.getElementById('f-stripeId').value.trim(),
+    amountDue:   document.getElementById('f-amountDue').value,
+    amount:      document.getElementById('f-amount').value || '0',
+    status:      document.getElementById('f-status').value,
+    date:        document.getElementById('f-date').value,
+    studentName: document.getElementById('f-studentName').value.trim(),
+    grade:       document.getElementById('f-grade').value.trim(),
+    notes:       document.getElementById('f-notes').value.trim(),
+  };
+  showLoader();
+  try {
+    if (id) {
+      const resp = await api('PUT', `/api/records/${id}`, payload);
+      const idx = state.data.records.findIndex(r => r.id === id);
+      if (idx !== -1) state.data.records[idx] = resp.record;
+    } else {
+      const resp = await api('POST', '/api/records', payload);
+      state.data.records.push(resp.record);
+    }
+    flashSaved(); closeModal('edit-modal'); renderAll();
+  } catch(e) { alert('Save failed: ' + e.message); }
+  hideLoader();
+}
+
+async function deleteRecord(id) {
+  if (!confirm('Delete this payment record?')) return;
+  showLoader();
+  try {
+    await api('DELETE', `/api/records/${id}`);
+    state.data.records = state.data.records.filter(r => r.id !== id);
+    flashSaved(); renderAll();
+  } catch(e) { alert('Delete failed: ' + e.message); }
+  hideLoader();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CSV IMPORT
+═══════════════════════════════════════════════════════════════════════ */
+function parseStripeCSV(raw) {
+  const lines = raw.trim().split(/\r?\n/).filter(Boolean);
+  if (lines.length < 2) return [];
+  const parseRow = line => {
+    const cols=[]; let cur=''; let inQ=false;
+    for (const ch of line) {
+      if (ch==='"'){inQ=!inQ;continue;}
+      if (ch===','&&!inQ){cols.push(cur.trim());cur='';continue;}
+      cur+=ch;
+    }
+    cols.push(cur.trim()); return cols;
+  };
+  const headers = parseRow(lines[0]).map(h=>h.toLowerCase().replace(/[\s()]/g,'_').replace(/__+/g,'_'));
+  const get=(row,...keys)=>{for(const k of keys){const i=headers.indexOf(k);if(i>=0&&row[i])return row[i];}return '';};
+  return lines.slice(1).map(l=>{
+    const row=parseRow(l);
+    const rawAmt=get(row,'amount','amount_paid','amount_captured');
+    const amt=rawAmt?(parseFloat(rawAmt)/100).toFixed(2):'0.00';
+    const st=get(row,'status','paid');
+    return {
+      stripeId:   get(row,'id','payment_intent_id','charge_id'),
+      payerName:  get(row,'customer_name','customer_description','name','billing_name'),
+      payerEmail: get(row,'customer_email','email','receipt_email','billing_email'),
+      amount:     amt,
+      status:     (st==='succeeded'||st==='true')?'Paid':'Pending',
+      date:       get(row,'created_utc_','created','date')||todayStr(),
+      studentName:'', grade:'', notes:''
+    };
+  }).filter(r=>r.payerEmail||r.stripeId);
+}
+
+let csvParsed = [];
+function previewCSV() {
+  const raw = document.getElementById('csv-raw').value;
+  csvParsed = parseStripeCSV(raw);
+  if (csvParsed.length === 0) { alert('No records found. Check the CSV format.'); return; }
+  let html = `<div style="background:var(--off);border-radius:8px;padding:12px;margin-bottom:12px;max-height:180px;overflow-y:auto;border:1px solid #e5e7eb">
+    <div style="font-size:11px;font-weight:700;color:var(--n7);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">
+      Preview — ${csvParsed.length} record(s) found
+    </div>`;
+  csvParsed.forEach(r => {
+    html += `<div style="font-size:12px;color:var(--dark);padding:6px 0;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center">
+      <div><strong>${esc(r.payerName)||'<em>No name</em>'}</strong> <span style="color:#6b7280;margin-left:8px">${esc(r.payerEmail)}</span></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span style="font-weight:700;color:var(--n7)">${fmtAED(r.amount)}</span>
+        <span class="badge b-${r.status}">${r.status}</span>
+        <span style="font-size:10px;color:var(--gold);font-weight:600">Student TBC</span>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  document.getElementById('csv-preview-area').innerHTML = html;
+  document.getElementById('csv-preview-btn').style.display = 'none';
+  document.getElementById('csv-import-btn').textContent   = `Import ${csvParsed.length} Record(s)`;
+  document.getElementById('csv-import-btn').style.display = 'inline-block';
+}
+
+async function importCSV() {
+  const cfg    = state.data.tripConfig;
+  const toSend = csvParsed.map(r => ({ ...r, amountDue: cfg.amountDue || '350' }));
+  showLoader();
+  try {
+    const resp = await api('POST', '/api/records/bulk', { records: toSend });
+    await loadData();
+    closeModal('csv-modal');
+    document.getElementById('csv-raw').value = '';
+    csvParsed = [];
+    alert(`✓ Imported ${resp.added} record(s). ${resp.skipped} duplicate(s) skipped.`);
+  } catch(e) { alert('Import failed: ' + e.message); }
+  hideLoader();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════════════════════════════════ */
+function renderSettings() {
+  const cfg = state.data.tripConfig;
+  const isAdmin = state.role === 'admin';
+  document.getElementById('settings-admin').style.display  = isAdmin ? '' : 'none';
+  document.getElementById('settings-teacher').style.display = isAdmin ? 'none' : '';
+  if (!isAdmin) return;
+  document.getElementById('config-display').innerHTML = `
+    ${Object.entries(cfg).map(([k,v])=>`
+      <div style="display:flex;gap:8px;margin-bottom:7px;font-size:13px">
+        <span style="font-weight:700;color:var(--n7);min-width:140px;text-transform:capitalize">${k.replace(/([A-Z])/g,' $1')}:</span>
+        <span>${v || '<em style="color:#9ca3af">Not set</em>'}</span>
+      </div>`).join('')}
+    <button class="btn btn-sec btn-sm" onclick="openConfigModal()" style="margin-top:12px">Edit Config</button>
+  `;
+}
+
+function openConfigModal() {
+  const cfg = state.data.tripConfig;
+  document.getElementById('cfg-name').value       = cfg.name       || '';
+  document.getElementById('cfg-school').value     = cfg.school     || '';
+  document.getElementById('cfg-amountDue').value  = cfg.amountDue  || '350';
+  document.getElementById('cfg-organiser').value  = cfg.organiser  || '';
+  openModal('config-modal');
+}
+
+async function saveConfig() {
+  const cfg = {
+    name:      document.getElementById('cfg-name').value.trim(),
+    school:    document.getElementById('cfg-school').value.trim(),
+    amountDue: document.getElementById('cfg-amountDue').value,
+    organiser: document.getElementById('cfg-organiser').value.trim(),
+  };
+  showLoader();
+  try {
+    await api('PUT', '/api/config', cfg);
+    state.data.tripConfig = { ...state.data.tripConfig, ...cfg };
+    flashSaved(); closeModal('config-modal'); renderAll();
+  } catch(e) { alert('Save failed: ' + e.message); }
+  hideLoader();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   EXPORT CSV
+═══════════════════════════════════════════════════════════════════════ */
+function exportCSV() {
+  const cfg  = state.data.tripConfig;
+  const cols = ['Student Name','Grade','Payer Name','Payer Email','Amount Due','Amount Paid','Status','Date','Stripe ID','Notes'];
+  const rows = state.data.records.map(r =>
+    [r.studentName,r.grade,r.payerName,r.payerEmail,
+     r.amountDue||cfg.amountDue,r.amount||'0',r.status,r.date,r.stripeId,r.notes]
+    .map(v=>`"${(v||'').replace(/"/g,'""')}"`).join(','));
+  const blob = new Blob([[cols.join(','),...rows].join('\n')],{type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${(cfg.name||'trip').replace(/\s+/g,'_')}_payments.csv`;
+  a.click();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MODAL HELPERS
+═══════════════════════════════════════════════════════════════════════ */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) closeModal(el.id); });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════════════════════════════ */
+function fmtAED(n) {
+  return 'AED ' + Number(n||0).toLocaleString('en-AE',{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
