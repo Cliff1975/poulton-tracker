@@ -32,8 +32,12 @@ header{background:linear-gradient(135deg,var(--n9),var(--n7));position:sticky;to
 .role-btn.active{background:var(--gold);color:var(--n9)}
 
 /* SAVE INDICATOR */
-#save-msg{color:var(--gl);font-size:11px;font-weight:600;margin-right:4px;opacity:0;transition:opacity .3s}
+#save-msg{display:inline-flex;align-items:center;gap:5px;background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.4);color:#6ee7b7;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-right:6px;opacity:0;transition:opacity .3s;letter-spacing:.3px}
 #save-msg.show{opacity:1}
+
+/* LOGOUT BUTTON */
+.logout-btn{padding:5px 12px;border-radius:7px;border:1px solid rgba(255,255,255,.25);cursor:pointer;font-size:12px;font-weight:600;background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);transition:all .2s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;margin-left:6px}
+.logout-btn:hover{background:rgba(239,68,68,.25);border-color:rgba(239,68,68,.4);color:#fca5a5}
 
 /* BANNER */
 #unnamed-banner{background:linear-gradient(90deg,var(--gold),var(--gl));padding:9px 16px;display:none}
@@ -231,7 +235,7 @@ select{width:auto;flex:none;cursor:pointer}
         </div>
       </div>
       <div class="nav-area">
-        <span id="save-msg">Saved ✓</span>
+        <span id="save-msg">✓ Saved</span>
         <button class="nav-btn active" onclick="showView('dashboard')">Dashboard</button>
         <button class="nav-btn" onclick="showView('payments')">Payments</button>
         <button class="nav-btn" onclick="showView('match')">Match Students</button>
@@ -241,6 +245,9 @@ select{width:auto;flex:none;cursor:pointer}
           <button class="role-btn active" onclick="setRole('admin')">Admin</button>
           <button class="role-btn" onclick="setRole('teacher')">Teacher</button>
         </div>
+        <button class="logout-btn" onclick="logout()" title="Log out">
+          🔓 <span id="logout-role-label">Admin</span> · Log out
+        </button>
       </div>
     </div>
   </header>
@@ -573,7 +580,18 @@ function hideLoader() { document.getElementById('loading-overlay').classList.rem
 function flashSaved() {
   const el = document.getElementById('save-msg');
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2000);
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+function logout() {
+  if (!confirm('Log out of the tracker?')) return;
+  state.pin  = '';
+  state.role = 'admin';
+  state.data = { tripConfig: {}, records: [] };
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('pin-screen').style.display = 'flex';
+  document.getElementById('pin-input').value = '';
+  document.getElementById('pin-error').textContent = '';
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -588,13 +606,15 @@ function setRole(role) {
 
 function applyRole() {
   const isAdmin = state.role === 'admin';
-  // Hide admin-only nav if teacher
   document.getElementById('settings-nav-btn').style.display = isAdmin ? '' : '';
   document.getElementById('admin-toolbar-btns').style.display = isAdmin ? 'flex' : 'none';
   document.getElementById('settings-admin').style.display  = isAdmin ? '' : 'none';
   document.getElementById('settings-teacher').style.display = isAdmin ? 'none' : '';
-  // If teacher and on payments/settings, redirect to match
-  if (!isAdmin && (state.currentView === 'settings')) showView('match');
+  // Update logout label to show current role
+  const lbl = document.getElementById('logout-role-label');
+  if (lbl) lbl.textContent = isAdmin ? 'Admin' : 'Teacher';
+  // If teacher and on settings, redirect to match
+  if (!isAdmin && state.currentView === 'settings') showView('match');
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
